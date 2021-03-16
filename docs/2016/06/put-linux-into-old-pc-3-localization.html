@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Put Linux into Old PC - (3) Localize the Language Environment - Hello, World!</title>
+    <meta name="keywords" content="linux,study" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Put Linux into Old PC - (3) Localize the Language Environment</h1>
+    <p class="sub_text">2016-06-28 by <i>terryoy</i>, in <a href="/guides/">guides</a>
+    </p>
+
+	<h3 id="toc_0">Part 3. Localize the language environment</h3>
+<p>It is very easy to support the multi-language environment if you&#39;re installing the normal Linux desktop. However, it takes a few steps if you want to try the manual way. To make it more challenging, I would like to add Japanese support(the second foreign language I&#39;m going to learn) together with Chinese support which is my mother language.</p>
+<p>The job to enable this multi-language environment includes three parts:</p>
+
+<ul>
+<li>Able to view the Asian characters,</li>
+<li>Able to input the Asian characters,</li>
+<li>The user interface are translated into the familiar language. (However, I might prefer an English environment just for working~)</li>
+</ul>
+
+<h4 id="toc_1">3.1 Enabling the Input Method</h4>
+<p>Now I want to enable the input method at first, because it enable me to try enter other characters. There are several approaches to support multi-language input method, such as <code>SCIM</code>, <code>ibus</code>, and <code>uim</code>. The currently recommendation is <strong>ibus</strong>. There are several popular alternatives for both Japanese and Chinese input methods. <code>Anthy</code> and <code>mozc</code> are for Japanese, and <code>pinyin</code>, <code>sunpinyin</code> and <code>google-pinyin</code> are for Chinese(let&#39;s hope that Sogou Pinyin is joining this competition~). You can choose as you prefer, but I will first install only two basic choices.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Install Anthy and Pinyin</span>
+$ sudo apt-get install ibus-anthy ibus-pinyin
+
+<span class="c1"># Setup the configurations for the first time (you may need to manually add the input method in the enabled list)</span>
+<span class="c1"># (for input method config)</span>
+$ im-config
+<span class="c1"># (for ibus config)</span>
+$ ibus-setup
+</pre></div>
+<p>Be sure to change the method switching keyboard shortcuts to &ldquo;Ctrl+Space&rdquo;, otherwise you may not correctly enable it(by default, it uses &ldquo;Super+Space&rdquo; to switch between but I have no &ldquo;Super&rdquo; key on my keyboard).</p>
+<p>After all the steps above, the ibus input method is still not enabled at start up, which means you need to manually start the daemon by executing &ldquo;ibus-setup&rdquo;. However, no doubt that I will fix this soon.</p>
+<p>To enable things at X start up, you need to put commands in <code>~/.xprofile</code> or <code>~/.xinitrc</code>, depends on the windows manager requirements. <code>~/.xprofile</code> is often used before windows manager start up, while <code>~/.xinitrc</code> is used by &ldquo;initx&rdquo; and its frontend &ldquo;startx&rdquo; to initialize the X window manager(remember we put &ldquo;exec openbox-session&rdquo; in this file previously?). The <code>ibus-daemon</code> program starts the ibus daemon server, so if I want to start ibus when X starts, I will put it in the ~/.xinitrc file. <a href="#ref">[2]</a></p>
+<div class="highlight"><pre><span></span>$ vi ~/.xinitrc
+<span class="c1"># (add at the end of the file)</span>
+ibus-daemon -drx
+</pre></div>
+<p>You can check out what the part of &ldquo;-drx&rdquo; means by <code>man ibus-daemon</code>. It&#39;s easy.</p>
+
+<h4 id="toc_2">3.2 Testing the Input method</h4>
+<p>There are a lot of applications that supports input method. Two I have tried, the browser and the terminal. Not every termimal emulator supports ibus input. Luckily, I have chosen <code>lxterminal</code> and it does the job.</p>
+<p>The first and easy test is on the browser. I changed the keyboard shortcut for &ldquo;switching to next input method&rdquo; to Ctrl+Space, because the default one is Super+Space but my <code>Super</code> key isn&#39;t available at the time and <code>Ctrl</code> is more like my preference. </p>
+<p>The Japanese font seems to be already available with the installation above, but the Chinese font isn&#39;t. So, by installing some extra Chinese fonts, you should be able to see most of the east asian characters.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Chinese Font</span>
+$ sudo apt-get install fonts-wqy-microhei fonts-wqy-zenhei
+</pre></div>
+<p>The &ldquo;Typing Method&rdquo; in the Japanese input method is more like a switch from Pinyin to Wubi in Chinese. My Japanese keyboard has Hiragana characters written on the keys, so I can choose &ldquo;Kana&rdquo; as typing method(a little bit like Wubi, typing words in characters). If you choose &ldquo;Romanji&rdquo; as the typing method, then you should input the characters in a phonetic way.</p>
+
+<h4 id="toc_3">3.3 Localizing the UI</h4>
+<p>The English UI is good enough for me in the most circumstances. But still, I want to look into the details for changing the language of applicatoin interfaces.</p>
+
+<h5 id="toc_4">Basic Locale Settings</h5>
+<p>The system variable &ldquo;LANG=xx_YY.ZZZZ&rdquo; has defined the language settings in three ways: <code>language code</code>, <code>country code</code>, and <code>encoding</code>. (Notice the upper cases and the lower cases.) This variable affects the language interface of most of the applications. To do an experiement, try to set the variable as below, before entering the X window environment. You will see the menu of applications are changed to a different font, but the language is possibly still in English. This is because the application has no Chinese locale interface installed.</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">LANG</span><span class="o">=</span>zh_CN.UTF-8
+</pre></div>
+
+<h3 id="toc_5">Reference</h3>
+<p><a name="ref"></a>
+[1] Debian i18n: <a href="https://www.debian.org/doc/manuals/debian-reference/ch08.en.html">www.debian.org/doc/manuals/debian-reference/ch08.en.html</a> <br/>
+[2] IBus: <a href="https://wiki.archlinux.org/index.php/IBus">wiki.archlinux.org/index.php/IBus</a></p>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/linux/">linux</a>,&nbsp;<a href="/tag/study/">study</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Put Linux into Old PC - (3) Localize the Language Environment';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Networking in Docker - Hello, World!</title>
+    <meta name="keywords" content="linux,docker" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Networking in Docker</h1>
+    <p class="sub_text">2018-01-12 by <i>terryoy</i>, in <a href="/guides/">guides</a>
+    </p>
+
+	<p>After installed an Ubuntu container in my docker, now I&#39;m trying to learn the networking tools in Ubuntu and Docker.</p>
+
+<ol>
+<li>Networking Tools in Ubuntu Again</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="c1"># package for ifconfig(which is too old)</span>
+$ apt install net-tools
+
+<span class="c1"># newer package for networking</span>
+$ apt install iproute2
+
+<span class="c1"># ping command</span>
+$ apt install iputils-ping
+
+<span class="c1"># check network interface</span>
+$ ifconfig
+eth0      Link encap:Ethernet  HWaddr <span class="m">02</span>:42:ac:11:00:02  
+          inet addr:172.17.0.2  Bcast:0.0.0.0  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:5956 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:3345 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:8376715 <span class="o">(</span><span class="m">8</span>.3 MB<span class="o">)</span>  TX bytes:186204 <span class="o">(</span><span class="m">186</span>.2 KB<span class="o">)</span>
+</pre></div>
+
+<ol>
+<li>Docker Commands for Networking</li>
+</ol>
+<p>There are three types of networks in docker, and the <code>bridge</code> network is by default presented in all docker instances.</p>
+<div class="highlight"><pre><span></span><span class="c1"># List networks in Docker</span>
+$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+a6bf46c2bc44        bridge              bridge              <span class="nb">local</span>
+e3826e52e7e6        host                host                <span class="nb">local</span>
+08a134ed472c        none                null                <span class="nb">local</span>
+
+<span class="c1"># Check docker&#39;s network detail</span>
+$ docker network inspect bridge
+<span class="o">[</span>
+    <span class="o">{</span>
+        <span class="s2">&quot;Name&quot;</span>: <span class="s2">&quot;bridge&quot;</span>,
+        <span class="s2">&quot;Id&quot;</span>: <span class="s2">&quot;a6bf46c2bc44dc16523ac28edd5524fccef79b779ae52602c868001763cd21c4&quot;</span>,
+        <span class="s2">&quot;Created&quot;</span>: <span class="s2">&quot;2018-01-09T11:36:15.168104899Z&quot;</span>,
+        <span class="s2">&quot;Scope&quot;</span>: <span class="s2">&quot;local&quot;</span>,
+        <span class="s2">&quot;Driver&quot;</span>: <span class="s2">&quot;bridge&quot;</span>,
+        <span class="s2">&quot;EnableIPv6&quot;</span>: false,
+        <span class="s2">&quot;IPAM&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;Driver&quot;</span>: <span class="s2">&quot;default&quot;</span>,
+            <span class="s2">&quot;Options&quot;</span>: null,
+            <span class="s2">&quot;Config&quot;</span>: <span class="o">[</span>
+                <span class="o">{</span>
+                    <span class="s2">&quot;Subnet&quot;</span>: <span class="s2">&quot;172.17.0.0/16&quot;</span>,
+                    <span class="s2">&quot;Gateway&quot;</span>: <span class="s2">&quot;172.17.0.1&quot;</span>
+                <span class="o">}</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;Internal&quot;</span>: false,
+        <span class="s2">&quot;Attachable&quot;</span>: false,
+        <span class="s2">&quot;Ingress&quot;</span>: false,
+        <span class="s2">&quot;ConfigFrom&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;Network&quot;</span>: <span class="s2">&quot;&quot;</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;ConfigOnly&quot;</span>: false,
+        <span class="s2">&quot;Containers&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;cfc178841a7940b6cbf43c8e0dbd7fb6672af3b3e8a9020632c75352685ec685&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;Name&quot;</span>: <span class="s2">&quot;ubuntu&quot;</span>,
+                <span class="s2">&quot;EndpointID&quot;</span>: <span class="s2">&quot;8c14adc4a61eacdc8bd2b261d2af4f17c7a966d9fcfb8c61b5f9284fa2eded45&quot;</span>,
+                <span class="s2">&quot;MacAddress&quot;</span>: <span class="s2">&quot;02:42:ac:11:00:02&quot;</span>,
+                <span class="s2">&quot;IPv4Address&quot;</span>: <span class="s2">&quot;172.17.0.2/16&quot;</span>,
+                <span class="s2">&quot;IPv6Address&quot;</span>: <span class="s2">&quot;&quot;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;Options&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;com.docker.network.bridge.default_bridge&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+            <span class="s2">&quot;com.docker.network.bridge.enable_icc&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+            <span class="s2">&quot;com.docker.network.bridge.enable_ip_masquerade&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+            <span class="s2">&quot;com.docker.network.bridge.host_binding_ipv4&quot;</span>: <span class="s2">&quot;0.0.0.0&quot;</span>,
+            <span class="s2">&quot;com.docker.network.bridge.name&quot;</span>: <span class="s2">&quot;docker0&quot;</span>,
+            <span class="s2">&quot;com.docker.network.driver.mtu&quot;</span>: <span class="s2">&quot;1500&quot;</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;Labels&quot;</span>: <span class="o">{}</span>
+    <span class="o">}</span>
+<span class="o">]</span>
+</pre></div>
+
+<h3 id="toc_0">3. Internal Networking</h3>
+<p>By default, the container is connected within a local network(172.17.0.1/16) bridged to the host machine, host can access the net gateway ip <code>172.17.0.1</code>. The contianers should be able to access each other in the local network provided by this net gateway. When you use the command <code>docker network inspect bridge</code>, you could see the list of containers and their IPs assigned.</p>
+
+<h4 id="toc_1">3.1 Accessing container&#39;s service by port mapping</h4>
+<p>Some containers as Nginx provide a service through a local port, in which case you could use port forwarding by your local IP. For example, you can check this port forwarding by <code>docker port</code> command or just listing the containers:</p>
+<div class="highlight"><pre><span></span><span class="c1"># list ports for container</span>
+$ docker port nginx
+<span class="m">80</span>/tcp -&gt; <span class="m">0</span>.0.0.0:5000
+
+<span class="c1"># list containers</span>
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                   PORTS                  NAMES
+cfc178841a79        ubuntu              <span class="s2">&quot;/bin/bash&quot;</span>              <span class="m">3</span> weeks ago         Up <span class="m">4</span> hours                                      ubuntu
+0200f61f5d65        nginx               <span class="s2">&quot;nginx -g &#39;daemon of…&quot;</span>   <span class="m">2</span> months ago        Up <span class="m">3</span> minutes             <span class="m">0</span>.0.0.0:5000-&gt;80/tcp   webserver
+</pre></div>
+<p>Now you can see there is a port mapping from <code>host:5000</code> to <code>container:80</code>.</p>
+<p>By default, no port is opened for a container to host, you need to specify the port mapping at <code>docker run</code> command with <code>-p</code>.</p>
+
+<pre><code># `-d` is when you needed it run as a daemon.
+$ docker run nginx -d -p 5000:80 --name nginx nginx</code></pre>
+<p>To open a port mapping for an existing container is very tricky. It is often said that you need to create another container instance based on the current just to open a port.</p>
+
+<h4 id="toc_2">3.2 Creating a Network</h4>
+<p>Now let&#39;s try something advanced. Let&#39;s create the different types of network one by one.</p>
+
+<h5 id="toc_3">3.2.1 Bridge Network</h5>
+<p>By default, the network you created will be a <code>bridged</code> network. You can add container to the network later. It creates a subnet and open only specific ports to the host to access service in the subnet, like NAT.</p>
+<div class="highlight"><pre><span></span>$ docker network create gamezone
+$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+0fe8bfe5222d        gamezone            bridge              <span class="nb">local</span>
+
+<span class="c1"># if you want to remove the bridge network</span>
+$ docker network rm gamezone
+</pre></div>
+<p>Now let&#39;s create an Ubuntu container called &ldquo;gamecenter&rdquo; which connects to the gamezone network and maps port 5000 to the docker host&#39;s 15000.</p>
+<div class="highlight"><pre><span></span>$ docker create --name gamecenter <span class="se">\</span>
+        --network gamezone <span class="se">\</span>
+        --publish <span class="m">15000</span>:5000 <span class="se">\</span>
+        -t -i ubuntu /bin/bash
+
+$ docker container ls -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS                     NAMES
+8cf4e293aae9        ubuntu              <span class="s2">&quot;/bin/bash&quot;</span>              <span class="m">10</span> minutes ago      Up <span class="m">10</span> minutes               <span class="m">0</span>.0.0.0:15000-&gt;5000/tcp   gamecenter
+
+$ docker network inspect gamezone
+<span class="o">[</span>
+    <span class="o">{</span>
+        <span class="s2">&quot;Name&quot;</span>: <span class="s2">&quot;gamezone&quot;</span>,
+        <span class="s2">&quot;Id&quot;</span>: <span class="s2">&quot;9b6417528a0e4a37ab9818e185a8046af06b3a9ae0eba40a2e494087676b70c9&quot;</span>,
+        <span class="s2">&quot;Created&quot;</span>: <span class="s2">&quot;2018-06-09T15:24:43.6288314Z&quot;</span>,
+        <span class="s2">&quot;Scope&quot;</span>: <span class="s2">&quot;local&quot;</span>,
+        <span class="s2">&quot;Driver&quot;</span>: <span class="s2">&quot;bridge&quot;</span>,
+        <span class="s2">&quot;EnableIPv6&quot;</span>: false,
+        <span class="s2">&quot;IPAM&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;Driver&quot;</span>: <span class="s2">&quot;default&quot;</span>,
+            <span class="s2">&quot;Options&quot;</span>: <span class="o">{}</span>,
+            <span class="s2">&quot;Config&quot;</span>: <span class="o">[</span>
+                <span class="o">{</span>
+                    <span class="s2">&quot;Subnet&quot;</span>: <span class="s2">&quot;172.18.0.0/16&quot;</span>,
+                    <span class="s2">&quot;Gateway&quot;</span>: <span class="s2">&quot;172.18.0.1&quot;</span>
+                <span class="o">}</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;Internal&quot;</span>: false,
+        <span class="s2">&quot;Attachable&quot;</span>: false,
+        <span class="s2">&quot;Ingress&quot;</span>: false,
+        <span class="s2">&quot;ConfigFrom&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;Network&quot;</span>: <span class="s2">&quot;&quot;</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;ConfigOnly&quot;</span>: false,
+        <span class="s2">&quot;Containers&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;8cf4e293aae932693f6769eea08665306485b17018999d8725f14b659e51c919&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;Name&quot;</span>: <span class="s2">&quot;gamecenter&quot;</span>,
+                <span class="s2">&quot;EndpointID&quot;</span>: <span class="s2">&quot;6ca3d79c633520dbee752ab6b462404aa8507f8eb9f2b2cf840de2d3322d27bb&quot;</span>,
+                <span class="s2">&quot;MacAddress&quot;</span>: <span class="s2">&quot;02:42:ac:12:00:02&quot;</span>,
+                <span class="s2">&quot;IPv4Address&quot;</span>: <span class="s2">&quot;172.18.0.2/16&quot;</span>,
+                <span class="s2">&quot;IPv6Address&quot;</span>: <span class="s2">&quot;&quot;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;Options&quot;</span>: <span class="o">{}</span>,
+        <span class="s2">&quot;Labels&quot;</span>: <span class="o">{}</span>
+    <span class="o">}</span>
+<span class="o">]</span>
+
+$ docker start gamecenter
+$ docker attach gamecenter
+$ ifconfig
+eth0      Link encap:Ethernet  HWaddr <span class="m">02</span>:42:ac:12:00:02  
+          inet addr:172.18.0.2  Bcast:172.18.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:20872 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:8684 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:28266802 <span class="o">(</span><span class="m">28</span>.2 MB<span class="o">)</span>  TX bytes:476241 <span class="o">(</span><span class="m">476</span>.2 KB<span class="o">)</span>
+</pre></div>
+<p>You can notice that the container &ldquo;gamecenter&rdquo; is running in the subnet of <code>172.18.0.1</code> currently. And we have open a port <code>15000</code> on the host, to map to gamecenter&#39;s port <code>5000</code>.</p>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/linux/">linux</a>,&nbsp;<a href="/tag/docker/">docker</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Networking in Docker';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

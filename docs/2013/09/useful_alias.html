@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Useful Aliases and Commands in Linux - Hello, World!</title>
+    <meta name="keywords" content="linux,shell" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Useful Aliases and Commands in Linux</h1>
+    <p class="sub_text">2013-09-23 by <i>terryoy</i>, in <a href="/tricks/">tricks</a>
+    </p>
+
+	<p>Below is a list of some useful aliases, which you could add to your linux shell environment.</p>
+<p>Copy and paste below content to your <strong><em>~/.bashrc</em></strong>.</p>
+
+<!--script src="https://gist.github.com/terryoy/6374725.js"></script-->
+<div class="highlight"><pre><span></span><span class="c1"># open a browser and view raw html (e.g. &quot;cat some.html | viewhtml&quot;)</span>
+<span class="nb">alias</span> <span class="nv">viewhtml</span><span class="o">=</span><span class="s1">&#39;firefox &quot;data:text/html;charset=utf-8;base64,$(base64 -w 0 &lt;&amp;0)&quot;&#39;</span>
+
+<span class="c1"># url encode / decode</span>
+<span class="nb">alias</span> <span class="nv">urlencode</span><span class="o">=</span><span class="s1">&#39;python -c &quot;import sys, urllib as ul; print ul.quote_plus(sys.argv[1])&quot;&#39;</span>
+<span class="nb">alias</span> <span class="nv">urldecode</span><span class="o">=</span><span class="s1">&#39;python -c &quot;import sys, urllib as ul; print ul.unquote_plus(sys.argv[1])&quot;&#39;</span>
+
+<span class="c1"># url shortener</span>
+<span class="nb">alias</span> <span class="nv">shortenurl</span><span class="o">=</span><span class="s2">&quot;python -c \&quot;import sys, urllib as ul; print ul.urlopen(&#39;http://tinyurl.com/api-create.php?url=%s&#39; % ul.quote_plus(sys.argv[1])).readline()\&quot;&quot;</span>
+</pre></div>
+
+<h3 id="toc_0"># work with hex</h3>
+<div class="highlight"><pre><span></span><span class="c1"># if you want to dump a file in hex</span>
+$ xxd -p file
+
+<span class="c1"># A Hex number convertor, convert decimal into hex(e.g. &quot;hex 34&quot; -&gt; 22)</span>
+<span class="nb">alias</span> <span class="nv">hex</span><span class="o">=</span><span class="s1">&#39;printf &quot;%x\n&quot;&#39;</span>
+</pre></div>
+
+<h3 id="toc_1"># mount a virtualbox disk on linux</h3>
+<div class="highlight"><pre><span></span><span class="c1"># before you can mount anything, install virtualbox-fuse</span>
+$ sudo apt-get install virtualbox-fuse
+
+<span class="c1"># there are &#39;disk/&#39; folder and &#39;space/&#39; folder.</span>
+<span class="c1"># &#39;vdfuse -r&#39; is for read only,</span>
+$ vdfuse -raf <span class="nv">$1</span> disk
+$ mount disk/Partition1 space
+</pre></div>
+
+<h3 id="toc_2">Set keyboard repeat rate and delay</h3>
+<div class="highlight"><pre><span></span><span class="c1">#Set keyboard repeat rate and delay</span>
+<span class="c1"># where 220 is the delay(ms) and 40 is repeat rate(cps)</span>
+
+<span class="c1"># under X</span>
+$ xset r rate <span class="m">220</span> <span class="m">40</span>
+<span class="c1"># under command line(or put it in /etc/rc.local, ~/.bashrc, ~/.bash_profile, etc.)</span>
+$ sudo kbdrate -r <span class="m">40</span> -d <span class="m">220</span>
+</pre></div>
+
+<h3 id="toc_3">Merge images into a movie</h3>
+<div class="highlight"><pre><span></span><span class="c1"># &quot;-framerate&quot; must be before &quot;-i&quot;, it&#39;s an input framerate, which means how many images are used in one second</span>
+<span class="c1"># &quot;-r&quot; is the output framerate</span>
+<span class="c1"># &quot;image%03d.jpg&quot; for &quot;image001.jpg&quot; pattern, while &quot;image%d.jpg&quot; for &quot;image1.jpg&quot;(no zero-padding) pattern</span>
+$ ffmpeg -framerate <span class="m">4</span> -i image%03d.jpg -r <span class="m">4</span> test.mp4
+</pre></div>
+
+<h3 id="toc_4">Check network port opens</h3>
+<div class="highlight"><pre><span></span><span class="c1"># Most of the network conversations are in tcp, so it&#39;s ok to filter the port with &quot;grep tcp&quot;</span>
+$ sudo netstat -pl <span class="p">|</span> grep tcp
+</pre></div>
+
+<h3 id="toc_5">Check user&#39;s default shell and change it</h3>
+<div class="highlight"><pre><span></span><span class="c1"># check default shell</span>
+$ cat /etc/passwd <span class="p">|</span> grep terryoy
+<span class="c1"># change default shell(check &quot;man chsh&quot; for more)</span>
+$ chsh -s /bin/bash
+</pre></div>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/linux/">linux</a>,&nbsp;<a href="/tag/shell/">shell</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Useful Aliases and Commands in Linux';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

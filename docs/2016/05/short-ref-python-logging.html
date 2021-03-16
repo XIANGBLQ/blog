@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>A Short Reference of Python Logging - Hello, World!</title>
+    <meta name="keywords" content="python" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>A Short Reference of Python Logging</h1>
+    <p class="sub_text">2016-05-26 by <i>terryoy</i>, in <a href="/tricks/">tricks</a>
+    </p>
+
+	<p>I have for many times use the logging function, but never understand it completely. So I go through the document and make some notes, hoping it will help me use it more quickly in the future. </p>
+
+<h3 id="toc_0">1. Basic Config</h3>
+<p>If you want to use a programmable method other than a configuration file, the basicConfig() method is the general initializing method.</p>
+<p>The most basic form is default log, which you don&#39;t need basicConfig(). It is using console output with WARNING level.</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logging</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span> <span class="c1"># no output</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;world&#39;</span><span class="p">)</span>
+<span class="n">world</span>
+</pre></div>
+<p>The basic config contains a list of below elements:</p>
+
+<ul>
+<li>  filename    - Using a <em>FileHandler</em> to output the log</li>
+<li>  filemode    - file open mode(&#39;r&#39;, &#39;w&#39;, &#39;a&#39;), mainly used to choose append or write a new log file</li>
+<li>  format      - A string for specifying the log output template, If you want to lookup a list of supported keywords, look for section &#39;LogRecord attributes&#39; in the python official document</li>
+<li>  datefmt     - A specified date/time format.</li>
+<li>  level       - set the <em>root</em> loglevel for the logger</li>
+<li>  stream      - Specify a stream for the StreamHandler, for example, a buffer output stream or stdout. It will be ignored if &ldquo;filename&rdquo; is present.</li>
+</ul>
+<p>The logger can be initialized only once when basicConfig() is called. Then </p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logging</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;program.log&#39;</span><span class="p">,</span> 
+        <span class="n">filemode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)-15s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> [</span><span class="si">%(module)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+</pre></div>
+
+<h3 id="toc_1">2. Configuration Object and the Modular Approach</h3>
+<p>When choosing the Modular Approach of logging, you need to deal with 4 elements:</p>
+
+<ul>
+<li>  loggers     - the interface that application modules used to log things</li>
+<li>  handlers    - send the log records (that loggers created) to the appropriate destinations</li>
+<li>  filters     - provide a finer grained facility for determining which log records should be output</li>
+<li>  formatters  - specify the layout of the log records in the final output</li>
+</ul>
+
+<h4 id="toc_2">2.1 Logger hierarchy</h4>
+<p>The loggers used by all the modules are formed in a conceptual hierarchy by the naming with a separator(&#39;.&#39;). For example: &#39;abc.text&#39;, is the descendant of logger &#39;abc&#39;, while &#39;abc&#39; can be the parent of &#39;abc.text&#39;, &#39;abc.pdf&#39;, &#39;abc.image&#39;, etc. A good convention is to use loggers in a module sense, using in each <code>.py</code> as below:</p>
+<div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+<p>The root of all loggers is called the &ldquo;root&rdquo; logger, which prints the logger name as &ldquo;ROOT&rdquo; in output.
+</p>
+
+<h4 id="toc_3">2.2 Useful handlers</h4>
+<p>There are some useful handlers in the section of python <em>Logging Howto</em> document. Some of them are listed as here:</p>
+
+<ul>
+<li>  StreamHandler   - to stream object (default stdin?)</li>
+<li>  FileHandler     - to a disk file</li>
+<li>  <strong>RotatingFileHandler</strong>         - from <em>BaseRotatingHandler</em>, send logs to files, rotating log file with a maximum file size.</li>
+<li>  <strong>TimedRotatingFileHandler</strong>    - from <em>BaseRotatingHandler</em>, send logs to files, rotating log file at a certain timed intervals.</li>
+<li>  SocketHandler/DatagramHandler   - send log messages to TCP/IP and UDP sockets</li>
+<li>  SMTPHandler     - Send to a designated email address</li>
+<li>  NullHandler     - Do nothing, it&#39;s used in development that supports logging with this mock</li>
+</ul>
+<p>This shows the variety of logging output scenarios, which you could look them up in the python doc.</p>
+
+<h4 id="toc_4">2.3 The propagation of loggers</h4>
+<p>Look at the flow of logging in the below diagram from <a href="https://docs.python.org/2/howto/logging.html#logging-advanced-tutorial">python&#39;s tutorial</a>,</p>
+<p><img src="https://docs.python.org/2/_images/logging_flow.png" alt="logging flow"/></p>
+<p>When a log record is send to the logger in the module, it will first check if its own filter(the filter of a logger) reject it, then pass to its handler; if propagation is set to true(by default), it will pass the log record to it&#39;s parent too, so the log record will bubble up till the root logger, and each logger will judge by their handler and filter to decide whether to output the log record. So we often setup a top level logger, and then configure a child logger only if needed.</p>
+
+<h4 id="toc_5">2.4 Configuring Logging</h4>
+<p>The most usual approaches are using <code>fileConfig()</code> and <code>dictConfig()</code>. With fileConfig() you can use a <strong>.conf</strong> file to load the settings (this approach is deprecated), and with dictConfig() you can use even wider range of persistence choices, such as JSON, python file, yaml, etc.</p>
+<p>For example, I have written a small utils for command line interaction and also want to log the HTTP request details. So I defined two handlers: one for console output, another for file output so that I can review the details. The console output must be simple without unneccessary information, and the file output should contains all the time, module details for investigation. Here is my configuration using a python file. (The advantages for a python configuration is that you can also use expressions and comments.)</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">logging.config</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;log_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;brief&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%(asctime)-15s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2"> [</span><span class="si">%(name)s</span><span class="s2">.</span><span class="si">%(funcName)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;datefmt&quot;</span><span class="p">:</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;console&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.StreamHandler&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;formatter&quot;</span><span class="p">:</span> <span class="s2">&quot;brief&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.handlers.RotatingFileHandler&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;dev.log&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;formatter&quot;</span><span class="p">:</span> <span class="s2">&quot;detail&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;propagate&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;log_config&quot;</span><span class="p">])</span>
+</pre></div>
+<p>There are two formatters: &ldquo;brief&rdquo; for simply output the message body, the root loggers is default logger for all the modules I write, and also the 3rd party libraries like python <code>requests</code>. Since all the info log should appear in both <strong>console</strong> and the <strong>file</strong>, I need to put both inthe root logger. However, to avoid the unneccssary debug log showing in console, I set the level <strong>INFO</strong> in the <strong>console</strong> handler. This enables the file logger logs everything while the console doesn&#39;t. </p>
+<p>Next I discover that the library &ldquo;requests&rdquo; also have some &ldquo;INFO&rdquo; log which is unneccessary in console, so I will specificially make it disappear using the <strong>loggers</strong> config. The important thing here is to use the <strong>propagate</strong> feature. </p>
+<p>The &ldquo;file&rdquo; logger wants the requests&#39; debug log, so I need to set the level to DEBUG. By default, it will propagate the log record to the &ldquo;root&rdquo; logger which make it appear to console. So I will use <code>propagate: False</code> to disable the propagation. Then the log records  will stay in the &ldquo;requests&rdquo; logger and will be invisible to the &ldquo;root&rdquo; logger.</p>
+<p>If you&#39;re not sure what to config with, write a small example project to experiment the result.</p>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/python/">python</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'A Short Reference of Python Logging';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Create a Root CA and Self-Sign Certificate for SSL - Hello, World!</title>
+    <meta name="keywords" content="server,security" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Create a Root CA and Self-Sign Certificate for SSL</h1>
+    <p class="sub_text">2015-02-23 by <i>terryoy</i>, in <a href="/tricks/">tricks</a>
+    </p>
+
+	<h3 id="toc_0">1. Concepts</h3>
+<p>Nowadays we often have HTTPS protected web access scenario, however it&#39;s expensive to purchase a certificates from authority if you&#39;re just running a small site. So it&#39;s better to create your own certificates and use your own SSL protection.</p>
+<p>The steps can be roughly described as below:</p>
+
+<pre><code>1. Create a private key (as Root CA Key), keep this very private
+2. Self-sign a root certificate
+3. Install root CA on your various workstations
+4. Create a CSR(Certificate Signing Request) for each of your authorized needed circumstances(device, server, client, etc.)
+5. Sign CA with root CA Key</code></pre>
+
+<h3 id="toc_1">2. Generate Root CA(Certificate Authority)</h3>
+<p>The first part is to create a private key and the CA, which will be used as the root CA to sign certificates.</p>
+<div class="highlight"><pre><span></span><span class="c1">## Step 1: Create a private key</span>
+
+<span class="c1"># generate a private root key</span>
+$ openssl genrsa -out rootCA.key <span class="m">2048</span>
+<span class="c1"># (or) generate a private root key with passphrase protection; and if you forgot the password, you need to do everything again</span>
+$ openssl genrsa -out rootCA.key <span class="m">2048</span> -des3
+
+
+<span class="c1">## Step 2: Self-sign a certificate</span>
+
+$ openssl req -x509 -new -nodes -key rootCA.key -days <span class="m">3650</span> -out rootCA.pem
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter <span class="s1">&#39;.&#39;</span>, the field will be left blank.
+-----
+Country Name <span class="o">(</span><span class="m">2</span> letter code<span class="o">)</span> <span class="o">[</span>AU<span class="o">]</span>:CN
+State or Province Name <span class="o">(</span>full name<span class="o">)</span> <span class="o">[</span>Some-State<span class="o">]</span>:Guangdong
+Locality Name <span class="o">(</span>eg, city<span class="o">)</span> <span class="o">[]</span>:Shenzhen
+Organization Name <span class="o">(</span>eg, company<span class="o">)</span> <span class="o">[</span>Internet Widgits Pty Ltd<span class="o">]</span>:TeaTime Production.
+Organizational Unit Name <span class="o">(</span>eg, section<span class="o">)</span> <span class="o">[]</span>:IT   
+Common Name <span class="o">(</span>e.g. server FQDN or YOUR name<span class="o">)</span> <span class="o">[]</span>:Terry Ouyang    
+Email Address <span class="o">[]</span>:terry.ouyang@gmail.com
+</pre></div>
+<p>Now we have a private root key(rootCA.key), and a root CA(rootCA.pem). If you want all the clients/PC/browsers accept your authorized certificate, you need to put your root CA in their local trusted stores(e.g. OS&#39;s trusted certificates repositories).</p>
+
+<h3 id="toc_2">3. Create Certificates and Sign with Root CA</h3>
+<p>For every device you want to authorize, you need to create their own private key, then complete the signed certificate with a certificate signing request(CSR).</p>
+<div class="highlight"><pre><span></span><span class="c1">## Step 1: Create the private key</span>
+
+$ openssl genrsa -out device.key <span class="m">2048</span>
+
+<span class="c1">## Step 2: Create the CSR (In this step you must set &quot;Common Name&quot; to your desire host if you&#39;re planning to use it as a server&#39;s certificate)</span>
+
+$ openssl req -new -key device.key -out device.csr
+...
+Common Name <span class="o">(</span>e.g. server FQDN or YOUR name<span class="o">)</span> <span class="o">[]</span>:terryoy.github.io
+...
+
+<span class="c1">## Step 3: Create the signed certificate </span>
+
+$ openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days <span class="m">3650</span>
+</pre></div>
+<p>Now you have the certificate private key(device.key) and the self CA signed certificate(device.crt). You can now use them for SSL communications.</p>
+
+<h3 id="toc_3">4. Congifuration for Nginx</h3>
+<p>Below is an example of enabling the SSL function for the service configuration.</p>
+<div class="highlight"><pre><span></span>server <span class="o">{</span>
+    listen <span class="m">443</span><span class="p">;</span>
+    ssl on<span class="p">;</span>
+    ssl_certificate /etc/nginx/ssl/service.crt<span class="p">;</span>
+    ssl_certificate_key /etc/nginx/ssl/service.key<span class="p">;</span>
+
+    ...
+<span class="o">}</span>
+</pre></div>
+<p>You can also check your server&#39;s certificate by the command below:</p>
+<div class="highlight"><pre><span></span>$ openssl s_client -connect www.yourexample.com:443
+</pre></div>
+
+<h3 id="toc_4">5. Setup SSL Factory on Android App</h3>
+<p>There is a good reference on <a href="http://stackoverflow.com/a/6378872">stackoverflow.com</a> for this problem.</p>
+<p>If you&#39;re using cocos2d-x 3.3+, it supports that you set a certificate for the HttpClient(globally), which allows you use your own certificate for SSL verification.</p>
+<div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">path</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">::</span><span class="n">getInstance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">fullPathForFilename</span><span class="p">(</span><span class="s">&quot;my_cacert.pem&quot;</span><span class="p">);</span>
+<span class="n">HttpClient</span><span class="o">::</span><span class="n">getInstance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setSSLVerification</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+</pre></div>
+
+<h3 id="toc_5">6. ACME Client</h3>
+<p><em>Update@2017: now you can use ACME clients and some free certificate service for personal HTTPS web sites.</em></p>
+<p>AMCE is short for Automatic Certificate Management Environment, which requires you to run a client on your server to provide checking of the ownership of your server and domain name, and provide signed certificates based on the result.</p>
+<p>Check out more information for the Free SSL/TLS Certificates: <a href="https://letsencrypt.org">letsencrypt.org</a></p>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/server/">server</a>,&nbsp;<a href="/tag/security/">security</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Create a Root CA and Self-Sign Certificate for SSL';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

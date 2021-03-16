@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Basic Usage for Docker - Hello, World!</title>
+    <meta name="keywords" content="linux,docker" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Basic Usage for Docker</h1>
+    <p class="sub_text">2017-11-06 by <i>terryoy</i>, in <a href="/guides/">guides</a>
+    </p>
+
+	<p>Just to keep some notes when started to use docker for my development projects.</p>
+
+<h3 id="toc_0">0. Get Started</h3>
+<p>For my mac, download the .dmg file from official web site. Then it will run a program with a task icon in the top bar.</p>
+<p>After the program has been initialized, you can open a terminal and try a few commands:</p>
+<div class="highlight"><pre><span></span><span class="c1"># check versions</span>
+$ docker --version
+$ docker-compose --version
+$ docker-machine --version
+
+<span class="c1"># Current images</span>
+$ docker images
+
+<span class="c1"># Running instances</span>
+$ docker ps
+</pre></div>
+
+<h3 id="toc_1">1. First Instance</h3>
+<p>The docker official Hello World image is small enough, which you can try as your first instance.</p>
+<div class="highlight"><pre><span></span>$ docker run hello-world
+</pre></div>
+<p>The image does not exist locally currently, but docker will continue to try downloading it and then run it.</p>
+<p>Then, you wil see the image locally.</p>
+<div class="highlight"><pre><span></span>$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+hello-world         latest              725dcfab7d63        <span class="m">2</span> days ago          <span class="m">1</span>.84kB
+</pre></div>
+<p>However, the container for this image is not visible in the list because <strong>the process has existed</strong>. You need to use a <code>-a</code> parameter to see it:</p>
+<div class="highlight"><pre><span></span>$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+c32eac048fda        hello-world         <span class="s2">&quot;/hello&quot;</span>            <span class="m">5</span> minutes ago       Exited <span class="o">(</span><span class="m">0</span><span class="o">)</span> <span class="m">5</span> minutes ago                       cranky_shaw
+</pre></div>
+
+<h3 id="toc_2">2. Server Instance</h3>
+<p>The Hello World container doesn&#39;t do anything. If you want to try something interesting, try the <a href="https://docs.docker.com/docker-for-mac/#explore-the-application-and-run-examples">nginx image</a> instead.</p>
+<div class="highlight"><pre><span></span>$ docker run -d -p <span class="m">8001</span>:80 --name webserver1 nginx
+</pre></div>
+<p>I choose a different port for the server, just to show how the port mapping is handled. When you check the instance with <code>docker ps</code>, you can see the image name, instance name, and the port mapping and get the meaning. When the container is up, you can access <code>http://localhost:8001/</code> to see the nginx home page.</p>
+<div class="highlight"><pre><span></span>$ docker ps 
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                  NAMES
+6f6ba1d3f285        nginx               <span class="s2">&quot;nginx -g &#39;daemon ...&quot;</span>   About a minute ago   Up About a minute   <span class="m">0</span>.0.0.0:8001-&gt;80/tcp   webserver1
+
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+nginx               latest              40960efd7b8f        <span class="m">38</span> hours ago        108MB
+hello-world         latest              725dcfab7d63        <span class="m">2</span> days ago          <span class="m">1</span>.84kB
+</pre></div>
+<p>A good point is that you can see how much disk usage every image uses. Now you can stop the service, or remove the unused resources by commands.</p>
+<div class="highlight"><pre><span></span><span class="c1"># container life cycle methods</span>
+$ docker stop webserver1
+$ docker start webserver1
+$ docker restart webserver1
+
+
+<span class="c1"># remove a container</span>
+$ docker rm webserver1
+
+<span class="c1"># remove an image</span>
+$ docker rmi hello-world
+</pre></div>
+<p>For server instance like Ubuntu, you need an interactive shell to work with it, so the command will be a little bit different:</p>
+
+<pre><code># start a new container named 'ubuntu'
+$ docker run --name ubuntu -ti ubuntu-core
+
+# run an existing container
+$ docker container start -i ubuntu
+
+# attach console to a server if it has started without interactive environment
+$ docker container start ubuntu
+$ docker attach ubuntu
+
+# If you want to detach from a server without stopping it
+# use `ctrl-p ctrl-q` key sequence</code></pre>
+<p>You may wonder the file size of each containers, you can checkt it by <code>docker ps -s</code>. You can see a ubuntu core only uses very small space with the minimal setup.</p>
+<div class="highlight"><pre><span></span>$ docker ps -s
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES               SIZE
+070a6e845653        ubuntu              <span class="s2">&quot;/bin/bash&quot;</span>              About an hour ago   Up About an hour                           ubuntu              <span class="m">96</span>.7MB <span class="o">(</span>virtual 219MB<span class="o">)</span>
+0200f61f5d65        nginx               <span class="s2">&quot;nginx -g &#39;daemon ...&quot;</span>   <span class="m">2</span> hours ago         Up <span class="m">2</span> hours          <span class="m">0</span>.0.0.0:5000-&gt;80/tcp   webserver           2B <span class="o">(</span>virtual 108MB<span class="o">)</span>
+</pre></div>
+
+<h3 id="toc_3">3. Other Settings</h3>
+<p>There are some Docker preferences also mentioned in the Get Started guide, which I should make some notes here:</p>
+
+<ul>
+<li><strong>Disk Image Location</strong>. on Mac, it is stored in a file called &ldquo;Docker.qcow2&rdquo; somewhere in ~/Library, and all the containers are store within this image. You can move it somewhere else.</li>
+<li><strong>Experimental features</strong>. It is not recommended for production environment, then I wonder why it is turned on by default on Mac.</li>
+<li>*<em>Registry, Configuration, and Certificates for the Daemon *</em>, use it when you needed.</li>
+</ul>
+
+<h4 id="toc_4">3.1 Download Images by Tags</h4>
+<div class="highlight"><pre><span></span><span class="c1"># Download images/repos from registry</span>
+$ docker pull &lt;image&gt;:&lt;tag&gt;
+
+<span class="c1"># Example of getting a core ubuntu system</span>
+$ docker pull ubuntu:xenial
+$ docker run --name ubuntu -ti ubuntu
+</pre></div>
+
+<h3 id="toc_5">4. Docker for Mac vs Docker Toolbox</h3>
+<p>Docker Toolbox is also installed by the .dmg installation. The programs include <code>docker-compose</code> and <code>docker-machine</code>.</p>
+
+<ul>
+<li>Docker for Mac is a Mac native  application, you get only one VM, and it is managed by Docker for Mac. The VM is used with a lightweight solution called HyperKit.</li>
+<li>Using Dokcker Toolbox, you can set up one or more VM and manage them.</li>
+</ul>
+
+<h3 id="toc_6">5. Docker Architecture</h3>
+<p>The Docker architecture can split into 3 parts:</p>
+
+<ul>
+<li>Docket Client, the <code>docker</code> cli tools for user to interact with docker daemon with Docker API.</li>
+<li>Docker Host, the service daemon <code>dockerd</code> listen for Docker API request and perform all kinds of management tasks about images, containers, networks, and volumns.</li>
+<li>Docker Registry, a cloud service which stores Docker images, such as Docker Hub and Docker Cloud(both are public registries).</li>
+</ul>
+
+<h4 id="toc_7">5.1 Docker Objects</h4>
+
+<ul>
+<li>Image, a read-only template with instructions for creating Docker container.</li>
+<li>Container, an instance of an image, with network, file system, etc. attached. You can create, delete, stop, resume containers.</li>
+<li>Service, allow you to scale containers across Docker daemons.</li>
+</ul>
+
+<h4 id="toc_8">5.2 The Underlying technology</h4>
+
+<ul>
+<li>Namespaces. When you run a container, Docker create a set of namespaces for the container, which provide a layer of isolation. The namespaces includes:
+
+<ul>
+<li><code>pid</code> for process</li>
+<li><code>net</code> for network interfaces</li>
+<li><code>ipc</code> for interprocess communication</li>
+<li><code>mnt</code> for file system</li>
+<li><code>uts</code> for kernel and version identifiers (Unix Timeshare System)</li>
+</ul></li>
+<li>Control Groups. A <code>cgroup</code> limits an application to a specific set of resources, and allow Docker Engine to share hardware resources to containers with optionally limits and constraints.</li>
+<li>Container Format. A combination of namespaces, control groups, and UnionFS, packed into a Wrapper. The default format is <code>libcontainer</code>.</li>
+</ul>
+<p>Refs:
+<a href="https://docs.docker.com/engine/docker-overview/#docker-architecture">Docker Architecture</a>
+<a href="https://store.docker.com/">Docker Store</a> is a market where you can distribute your images.</p>
+
+<h3 id="toc_9">6. Developing Apps with Docker</h3>
+<p>It&#39;s easy to setup Docker to deploy with your app. All you need to do is to add a <code>Dockerfile</code> in your source folder and then build the image. The official example demonstrate how a small flask app is built with Docker.</p>
+
+<h4 id="toc_10">6.1 First time image</h4>
+<p>I summarize the steps as below:</p>
+
+<ul>
+<li>Go to docker <a href="https://hub.docker.com/_/python/">hub</a> to find a target python image. It already has all kinds of  Dockerfile template for you to copy.</li>
+<li>Create a local copy of the Docker file. Make sure you understand the template and knows what to modify according to your app.</li>
+<li>Write a flask <code>app.py</code> and a <code>requirements.txt</code> as usual.</li>
+<li>Build the docker image and then run with it.</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="c1"># prepare the source files(...skipped here)</span>
+$ ls
+Dockerfile    app.py      requirements.txt
+
+<span class="c1"># build the image</span>
+$ docker build -t slim-flask .
+
+<span class="c1"># create and run the container</span>
+$ docker run -p <span class="m">4000</span>:80 slim-flask
+ * Running on http://0.0.0.0:80/ <span class="o">(</span>Press CTRL+C to quit<span class="o">)</span>
+</pre></div>
+<p>The result will be:</p>
+
+<ul>
+<li>Only a Dockerfile is added to your source, and others are still remain</li>
+<li>A Python docker image is downloaded, which takes the size of 156MB or 691MB depends on if you choose the &ldquo;slim&rdquo; version.</li>
+<li>A flask image for your app is genenrated, which contains the content from the original python image, the pip installed packages from requirements, and your source files. So the size is slightly bigger than the python image.</li>
+</ul>
+<div class="highlight"><pre><span></span>$ docker images 
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+slim-flask          latest              3032f935f40c        <span class="m">10</span> seconds ago      166MB
+python              slim                a79297999298        <span class="m">45</span> hours ago        156MB
+</pre></div>
+
+<h4 id="toc_11">6.2 Create image from a container</h4>
+<p>However, sometimes you want to make configurations inside a container and want to save it as an image. You can do that:</p>
+<div class="highlight"><pre><span></span>$ docker container commit <span class="o">[</span>options<span class="o">]</span> CONTAINER <span class="o">[</span>repository:<span class="o">[</span>TAG<span class="o">]]</span>
+
+<span class="c1"># example</span>
+$ docker container commit ubuntu ubuntu-image
+</pre></div>
+
+<h4 id="toc_12">6.3 Publish docker image</h4>
+<p>Use it when it is needed.</p>
+<div class="highlight"><pre><span></span>$ docker login             <span class="c1"># Log in this CLI session using your Docker credentials</span>
+$ docker tag &lt;image&gt; username/repository:tag  <span class="c1"># Tag &lt;image&gt; for upload to registry</span>
+$ docker push username/repository:tag            <span class="c1"># Upload tagged image to registry</span>
+$ docker run username/repository:tag                   <span class="c1"># Run image from a registry</span>
+</pre></div>
+
+<h3 id="toc_13">7. Docker mirrors</h3>
+
+<ul>
+<li>Docker(Official), <code>--registry-mirror=https://registry.docker-cn.com</code></li>
+<li>Netease, <a href="http://hub-mirror.c.163.com">hub-mirror.c.163.com</a></li>
+<li>USTC, <a href="https://docker.mirrors.ustc.edu.cn">docker.mirrors.ustc.edu.cn</a></li>
+<li>Daocloud &amp; Alicloud, need registration, and Alicloud needs an dev platform account.</li>
+</ul>
+<p><a href="https://ieevee.com/tech/2016/09/28/docker-mirror.html">source</a></p>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/linux/">linux</a>,&nbsp;<a href="/tag/docker/">docker</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Basic Usage for Docker';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

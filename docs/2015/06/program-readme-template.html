@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>A Template for Program Readme on Github - Hello, World!</title>
+    <meta name="keywords" content="programming" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>A Template for Program Readme on Github</h1>
+    <p class="sub_text">2015-06-03 by <i>terryoy</i>, in <a href="/guides/">guides</a>
+    </p>
+
+	<p>When writing a Program, the developer should be clear about the purpose, to eliminate time wasted. Refering to the <a href="http://textfiles.com/programming/writprog.pro">How to Program</a>, I propose a documatation template companied with a Software Development Life Cycle to ensure this.</p>
+
+<pre><code>1. SPECIFICATION
+2. PROGRAM DESIGN
+3. CODE DESIGN
+4. CONSTRUCTION AND DESIGN</code></pre>
+<p>So, starting a project on github, I think we should follow a basic documentation structure to answer each questions, to ensure that your purpose is clear enough.</p>
+
+<h3 id="toc_0">1. Speficication</h3>
+<p>In this stage, four things matter.</p>
+
+<ul>
+<li><p>User Interface</p>
+<p>in what approach does user interact with the program?
+what input/output?
+command line? menus? how much freedom allowed?</p></li>
+<li><p>Algorithm</p>
+<p>what specific computation behind the program?
+what method do we use?</p></li>
+<li><p>Data Structures</p>
+<p>how should the data of the problem be organized?</p></li>
+<li><p>[Generality]</p>
+<p>is it used only in a small number of situations? or is it general purpose of wide variety of circumstances?
+you need fewer choices if made for a small number of situations, and more choices and more commands for large number of situations</p></li>
+<li><p>[Robustness]
+how gracefully does the program respond to bad data or bad commands?</p></li>
+</ul>
+
+<h3 id="toc_1">2. Program Design</h3>
+<p>A design of the program may be often represented by a structure chart, but it&#39;s not the most important thing. Instead, you should divied the large program into <strong>subroutines</strong>.</p>
+
+<ul>
+<li>Design Structure
+top level routines
+    sub routines</li>
+</ul>
+<p>There&#39;re a few ideas for evaluating the desgin:</p>
+
+<pre><code>1. Keep subroutines short
+2. Keep subroutines single-purpose
+3. Keep calling sequence short
+4. Communicate data through calling sequences
+5. Limit use of flag variables
+6. Make design hierarchical</code></pre>
+
+<h3 id="toc_2">[3. Setup and Testing]</h3>
+
+<h3 id="toc_3">[4. About and License]</h3>
+<p><em>(Since the original post discontinued, I have to complete the rest of the template myself.)</em></p>
+<p>Following is a template in markdown:</p>
+
+<pre><code>### 1. Specification
+
+##### User Interface
+
+##### Algorithms
+
+##### Data Structures
+
+##### [Generality]
+
+##### [Robustness]
+
+### 2. Program Design
+
+##### Design Structure
+
+##### Public Interface
+
+### 3. Setup and Testing
+
+### 4. About
+
+### 5. License</code></pre>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/programming/">programming</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'A Template for Program Readme on Github';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

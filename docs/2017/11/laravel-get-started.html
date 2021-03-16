@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Getting Laravel Started - Hello, World!</title>
+    <meta name="keywords" content="php" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Getting Laravel Started</h1>
+    <p class="sub_text">2017-11-24 by <i>terryoy</i>
+    </p>
+
+	<p>After I found that PHP7.1 is in-the-box with OSX, it motivates me to start learning PHP(a.k.a. &ldquo;the best language in the world&rdquo; :P) and give some try to small projects. What I got from my friend is that <a href="https://laravel.com/">Laravel</a> is the quite popular web framework for PHP. So now I setting up the development and deployment environment to get started.</p>
+
+<h3 id="toc_0">1.Installing dependencies</h3>
+<p>On my MBP desktop, it&#39;s recommended to use <a href="https://laravel.com/docs/5.5/valet">Valet</a> if you want just a small additional tools to run it, and connect to existing databases on the machine. Otherwise it would be good to use a virtualbox image <a href="https://laravel.com/docs/5.5/homestead">Homestead</a> to have an all-in-one setup for development.</p>
+<p>While my Ubuntu 16 server, I would like to install dependencies by hand, so I could get familiar with what it takes to run Laravel. Now here&#39;s what I tried.</p>
+<div class="highlight"><pre><span></span>$ sudo apt install php7.0 php7.0-cli php7.0-zip php7.0-mbstring php7.0-mbstring php7.0-xml
+</pre></div>
+<p>Then we need to install <a href="https://getcomposer.org">Composer</a> to install other php packages. It&#39;s like the <code>pip</code> to Python and the <code>npm</code> to NodeJS.</p>
+<div class="highlight"><pre><span></span><span class="c1"># install to $HOME/bin</span>
+$ <span class="nb">cd</span> ~
+$ wget https://getcomposer.org/installer -o composer-setup.php
+$ php composer-setup.php --install-dir<span class="o">=</span>bin --filename<span class="o">=</span>composer
+
+
+<span class="c1"># (alternatively) You could try the one-line command bellow for default installation</span>
+$ curl -s https://getcomposer.org/installer <span class="p">|</span> php
+</pre></div>
+<p>Then try the composer command to see if you have it.</p>
+<div class="highlight"><pre><span></span>$ composer
+</pre></div>
+
+<h3 id="toc_1">2.Installing Laravel Valet</h3>
+<p><strong>Valet</strong> is a lightweight solution for hosting Laravel in development, and only avaiable on OSX. It uses brew to install php7.1 and other dependencies, but first you need Composer to install Laravel Valet. So install the composer using the script above first.</p>
+<p>After composer is installed, use it to download the Valet package.</p>
+<div class="highlight"><pre><span></span>$ composer global require laravel/valet
+</pre></div>
+<p>After composer install the package, you should note about where it is installed. Because you need to set the $PATH environment variables to enable the command from the packages. On OSX, the executable programs are in <code>~/.composer/vendor/bin</code>, and on Ubuntu, the path might be <code>~/.config/composer/vendor/bin</code>.</p>
+<p>Then you can use valet commands to manage your development environment.</p>
+
+<h3 id="toc_2">3.Install Laravel</h3>
+<p>Installing Laravel is similar to Valet. Use <code>composer</code> to download and install the package globally.</p>
+<div class="highlight"><pre><span></span>$ composer global require <span class="s2">&quot;laravel/installer&quot;</span>
+</pre></div>
+<p>Then you can use <code>laravel</code> command to create a new project:</p>
+<div class="highlight"><pre><span></span>$ laravel new myproject
+</pre></div>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/php/">php</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Getting Laravel Started';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Hello, World!" />
+    <meta name="application-name" content="Hello, World!" />
+    <title>Setup SSH Identity Key Login in Linux - Hello, World!</title>
+    <meta name="keywords" content="linux,shell" />
+    <meta name="description" content="" />
+    
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Hello, World!" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=dd9d9" />
+    <link rel="stylesheet" href="/static/css/pygment_trac.css?v=a6c15" />
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6012718593977391" async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="clear">
+    <h1>Hello, World!</h1>
+    <p>I'm <i>terryoy</i></p>
+    <p class="view"><a href="https://github.com/terryoy">View My GitHub Profile</a></p>
+    
+    <p class="view"><a href="http://terryoy.github.io/thoughts/">中文博客</a></p>
+    
+
+    <p>&nbsp;</p>
+    
+    <p><a class="feed" href="/feed.xml">RSS feed</a></p>
+</header><!-- #header -->
+<nav id="nav" role="navigation">
+    <a href="/">Home</a>
+    <a href="/guides/">Guides</a>
+    <a href="/tricks/">Tricks</a>
+    <a href="/projects.html">*Projects</a>
+    <a href="/about.html">About Me</a>
+</nav>
+
+<section class="main"><article id="main" class="hentry">
+	<h1>Setup SSH Identity Key Login in Linux</h1>
+    <p class="sub_text">2014-01-08 by <i>terryoy</i>, in <a href="/tricks/">tricks</a>
+    </p>
+
+	<p>This example is about how to create a new user and enable SSH public-key authentication in Ubuntu Server. It is necessary if your server is open to the public on internet.</p>
+
+<h2 id="toc_0">1. Create a New User on Server</h2>
+<p>In a traditional way, people use the command &ldquo;useradd&rdquo; to create user account, then together with other commands to setup the group, the home folder for the user.</p>
+<div class="highlight"><pre><span></span>$ useradd terry
+$ passwd terry
+$ mkdir /home/terry
+$ chown -R terry:users /home/terry
+</pre></div>
+<p>In a debian way, there is one command which does it all: &ldquo;adduser&rdquo;.</p>
+<div class="highlight"><pre><span></span>$ adduser edmund
+Adding user <span class="s1">&#39;edmund&#39;</span> ...
+Adding new group <span class="s1">&#39;edmund&#39;</span> <span class="o">(</span><span class="m">1001</span><span class="o">)</span> ...
+Adding new user <span class="s1">&#39;edmund&#39;</span> <span class="o">(</span><span class="m">1001</span><span class="o">)</span> with group <span class="s1">&#39;edmund&#39;</span> ...
+Creating home directory <span class="s1">&#39;/home/edmund&#39;</span> ...
+Copying files from <span class="s1">&#39;/etc/skel&#39;</span> ...
+Enter new UNIX password: 
+Retype new UNIX password: 
+passwd: password updated successfully
+Changing the user information <span class="k">for</span> edmund
+Enter the new value, or press ENTER <span class="k">for</span> the default
+    Full Name <span class="o">[]</span>: 
+    Room Number <span class="o">[]</span>: 
+    Work Phone <span class="o">[]</span>: 
+    Home Phone <span class="o">[]</span>: 
+    Other <span class="o">[]</span>: 
+Is the information correct? <span class="o">[</span>Y/n<span class="o">]</span>
+</pre></div>
+
+<h2 id="toc_1">2. Generate SSH Key and Apply to Server</h2>
+<p>With SSH key login, user require a public/private key pairs to authenticate the login. SSH can use both &ldquo;RSA&rdquo; and &ldquo;DSA&rdquo; keys, however according to the <a href="https://help.ubuntu.com/community/SSH/OpenSSH/Keys#Key-Based_SSH_Logins">ubuntu guide</a>, &ldquo;RSA&rdquo; is the only recommended choice for new keys. </p>
+<p>First thing you should keep in mind, the private key should <strong>NOT</strong> allow to be accessed by anybody else(e.g. set &ldquo;700&rdquo; with chmod). We will create the RSA keys in your <strong>local</strong> machine, then copy the public key to the <strong>remote</strong> server.</p>
+<div class="highlight"><pre><span></span>$ mkdir ~/.ssh
+$ chmod <span class="m">700</span> ~/.ssh      <span class="c1"># set access right only to user self</span>
+$ ssh-keygen -t rsa     <span class="c1"># **or you could use &quot;ssh-keygen -t rsa -b 4096&quot; for more secure login, default is 2048**.</span>
+Generating public/private rsa key pair.
+Enter file <span class="k">in</span> which to save the key <span class="o">(</span>/home/edmund/.ssh/id_rsa<span class="o">)</span>: 
+Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>: 
+Enter same passphrase again: 
+Your identification has been saved <span class="k">in</span> /home/edmund/.ssh/id_rsa.
+Your public key has been saved <span class="k">in</span> /home/edmund/.ssh/id_rsa.pub.
+
+<span class="c1"># next copy the public key to server. you can use a one-command way or manually copy the key to server.</span>
+$ ssh-copy-id user@machine      <span class="c1"># one-command way</span>
+<span class="c1"># manually way: copy the public key to server, and add it to authorized_key</span>
+$ scp ~/.ssh/id_rsa.pub user@machine:~/.ssh/my_rsa.pub
+$ ssh user@machine
+$ <span class="nb">cd</span> ~/.ssh
+$ cat my_rsa.pub &gt;&gt; authorized_keys
+</pre></div>
+
+<h2 id="toc_2">3. Update SSH Daemon configuration on Server</h2>
+<p>On the remote machine, currently the password authentication is still enabled, so we need to enable the RSA Authentication and disable the Password Authentication for the better security.</p>
+<p>Open <strong>/etc/ssh/sshd_config</strong> on server, find(or add) the below items and set the values:
+<code>
+PubkeyAuthentication yes
+RSAAuthentication yes
+PasswordAuthentication no
+</code>
+Next restart ssh service: <code>$ sudo service ssh restart</code>
+Now try login in the local machine:
+<code>
+$ ssh user@machine  # Or,
+$ ssh -i id_rsa user@machine
+</code>
+If your key matches, you will directly go into the console shell, or else you will get the following error info, which means you configuration applied successfully.
+<code>
+Permission denied (publickey).
+</code>
+If you want to revoke an authorized key for some user, you can find the user&#39;s public key in <strong>&ldquo;~/.ssh/authorized_keys&rdquo;</strong> and remove it.</p>
+
+<hr/>
+
+<h4 id="toc_3"><em>Extra Bonus: below is a small trick to use the keys to encrypt/decrypt text for daily use.</em></h4>
+<div class="highlight"><pre><span></span><span class="c1"># encrypt a text file, and output to a file</span>
+$ openssl enc -aes-256-cbc -e -in textfile.txt -out encrypted.txt -pass pass:some_password
+<span class="c1"># decrypt a text file, and output to a file(else it will print to the console)</span>
+$ openssl enc -aes-256-cbc -d -in encrypted.txt -out textfile.txt -pass pass:some_password
+
+<span class="c1"># encode in base64 (the &quot;enc&quot; option let you specify a cipher, e.g. &quot;-base64&quot; here)</span>
+$ openssl enc -base64 -e -in tetfile.txt
+$ openssl enc -base64 -e <span class="o">&lt;&lt;&lt;</span> <span class="s2">&quot;Encode this text please&quot;</span>
+$ openssl base64 -e <span class="o">&lt;&lt;&lt;</span> <span class="s2">&quot;Encode this text please&quot;</span>
+<span class="c1"># decode in base64</span>
+$ openssl base64 -d <span class="o">&lt;&lt;&lt;</span> <span class="s2">&quot;RW5jb2RlIHRoaXMgdGV4dCBwbGVhc2UK&quot;</span>
+</pre></div>
+
+
+
+	<p/>
+	<hr/>
+
+    <div class="sub_text">
+        <span>Tags:
+            <a href="/tag/linux/">linux</a>,&nbsp;<a href="/tag/shell/">shell</a>
+		</span>
+
+        
+    </div>
+    
+
+	<p/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-6012718593977391"
+           data-ad-slot="1086396907"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'terryoy';
+        var disqus_title = 'Setup SSH Identity Key Login in Linux';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    
+</article></section>
+
+<footer id="footer">
+  <amp-ad width="100vw" height="320"
+       type="adsense"
+       data-ad-client="ca-pub-6012718593977391"
+       data-ad-slot="1828084194"
+       data-auto-format="rspv"
+       data-full-width="">
+    <div overflow=""></div>
+  </amp-ad>
+    <p><small>Hosted on GitHub Pages &mdash;<br/> Theme adopted from <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+</footer><!-- #footer -->
+</div><!-- #wrapper -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-50656512-1', 'terryoy.github.io');
+ga('send', 'pageview');
+</script> <!-- google analytics -->
+
+</body>
+</html>
